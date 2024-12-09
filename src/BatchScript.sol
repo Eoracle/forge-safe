@@ -114,6 +114,9 @@ abstract contract BatchScript is Script {
         } else if (chainId == 43114) {
             SAFE_API_BASE_URL = "https://safe-transaction-avalanche.safe.global/api/v1/safes/";
             SAFE_MULTISEND_ADDRESS = 0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761;
+        } else if (chainId == 11_155_111) {
+            SAFE_API_BASE_URL = "https://safe-transaction-sepolia.safe.global/api/v1/safes/";
+            SAFE_MULTISEND_ADDRESS = 0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761;
         } else {
             revert("Unsupported chain");
         }
@@ -150,7 +153,9 @@ abstract contract BatchScript is Script {
         bytes memory data_
     ) internal returns (bytes memory) {
         // Add transaction to batch array
-        encodedTxns.push(abi.encodePacked(Operation.CALL, to_, value_, data_.length, data_));
+        encodedTxns.push(
+            abi.encodePacked(Operation.CALL, to_, value_, data_.length, data_)
+        );
 
         // Simulate transaction and get return value
         vm.prank(safe);
@@ -164,9 +169,20 @@ abstract contract BatchScript is Script {
 
     // Convenience funtion to add an encoded transaction to the batch, but passes
     // 0 as the `value` (equivalent to msg.value) field.
-    function addToBatch(address to_, bytes memory data_) internal returns (bytes memory) {
+    function addToBatch(
+        address to_,
+        bytes memory data_
+    ) internal returns (bytes memory) {
         // Add transaction to batch array
-        encodedTxns.push(abi.encodePacked(Operation.CALL, to_, uint256(0), data_.length, data_));
+        encodedTxns.push(
+            abi.encodePacked(
+                Operation.CALL,
+                to_,
+                uint256(0),
+                data_.length,
+                data_
+            )
+        );
 
         // Simulate transaction and get return value
         vm.prank(safe);
