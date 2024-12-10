@@ -462,10 +462,11 @@ abstract contract BatchScript is Script {
         );
         (uint256 status, bytes memory data) = endpoint.get();
         if (status == 200) {
+            // If the response is short, there are no transactions
+            if (data.length < 100) {
+                return 0;
+            }
             string memory resp = string(data);
-            string[] memory results;
-            results = resp.readStringArray(".results");
-            if (results.length == 0) return 0;
             return resp.readUint(".results[0].nonce") + 1;
         } else {
             revert("Get nonce failed!");
